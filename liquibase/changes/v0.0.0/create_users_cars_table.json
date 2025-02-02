@@ -1,0 +1,50 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+              "id": "Create users_cars table",
+              "author": "ahmoh",
+              "changes": [
+                {
+                  "createTable": {
+                    "tableName": "users_cars",
+                    "columns": [
+                      {
+                        "column": {
+                          "name": "user_id",
+                          "type": "uuid",
+                          "constraints": {
+                            "foreignKeyName": "fk_user_id",
+                            "referencedTableName": "users",
+                            "referencedColumnNames": "id",
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "car_id",
+                          "type": "uuid",
+                          "constraints": {
+                            "foreignKeyName": "fk_car_id",
+                            "referencedTableName": "cars",
+                            "referencedColumnNames": "id",
+                            "nullable": false
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "addPrimaryKey": {
+                      "columnNames": "user_id, car_id",
+                      "constraintName": "pk_user_car",
+                      "tableName": "users_cars"
+                  }
+              }
+              ]
+            }
+        }
+    ]
+}

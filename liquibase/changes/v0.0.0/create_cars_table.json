@@ -1,0 +1,37 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+              "id": "Create cars table",
+              "author": "ahmoh",
+              "changes": [
+                {
+                  "createTable": {
+                    "tableName": "cars",
+                    "columns": [
+                      {
+                        "column": {
+                          "name": "id",
+                          "type": "uuid",
+                          "constraints": {
+                            "primarykey": true,
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "name",
+                          "type": "varchar(100)",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }]
+            }
+        }
+    ]
+}

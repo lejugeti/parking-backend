@@ -1,0 +1,24 @@
+{
+  "databaseChangeLog": [
+    {
+      "include": {
+        "file": "v0.0.0/create_users_table.json"
+      }
+    },
+    {
+      "include": {
+        "file": "v0.0.0/create_cars_table.json"
+      }
+    },
+    {
+      "include": {
+        "file": "v0.0.0/create_users_cars_table.json"
+      }
+    },
+    {
+      "include": {
+        "file": "v0.0.0/create_park_location_table.json"
+      }
+    }
+  ]
+}

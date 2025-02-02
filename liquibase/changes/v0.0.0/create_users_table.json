@@ -1,0 +1,46 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+              "id": "Create users table",
+              "author": "ahmoh",
+              "changes": [
+                {
+                  "createTable": {
+                    "tableName": "users",
+                    "columns": [
+                      {
+                        "column": {
+                          "name": "id",
+                          "type": "uuid",
+                          "constraints": {
+                            "primarykey": true,
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "login",
+                          "type": "varchar(50)",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "password",
+                          "type": "varchar(50)",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }]
+            }
+        }
+    ]
+}

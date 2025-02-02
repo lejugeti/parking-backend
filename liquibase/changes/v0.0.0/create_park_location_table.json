@@ -1,0 +1,77 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+              "id": "Create park_location table",
+              "author": "ahmoh",
+              "changes": [
+                {
+                  "createTable": {
+                    "tableName": "park_location",
+                    "columns": [
+                      {
+                        "column": {
+                          "name": "id",
+                          "type": "uuid",
+                          "constraints": {
+                            "primaryKey": true,
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "car_id",
+                          "type": "uuid",
+                          "constraints": {
+                            "foreignKeyName": "fk_car_id",
+                            "referencedTableName": "cars",
+                            "referencedColumnNames": "id",
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "park_start_time",
+                          "type": "datetime",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "park_end_time",
+                          "type": "datetime",
+                          "constraints": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "location",
+                          "type": "varchar(100)",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "reminder",
+                          "type": "boolean",
+                          "constraints": {
+                            "nullable": false
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+        }
+    ]
+}

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "liquibase": "node-liquibase --changeLogFile='./liquibase/changelog.json' --url='jdbc:postgresql://localhost:5432/postgres' --driver-properties-file=./liquibase/config/pg.properties",
+    "liquibase": "node-liquibase --searchPath='./liquibase/changes' --changeLogFile='changelog.json' --url='jdbc:postgresql://localhost:5432/postgres' --driver-properties-file=./liquibase/config/pg.properties",
     "liquibase:status": "npm run liquibase status",
     "liquibase:update": "npm run liquibase update",
     "start": "node --watch ./bin/www"
