@@ -33,6 +33,18 @@
                       },
                       {
                         "column": {
+                          "name": "user_who_park_id",
+                          "type": "uuid",
+                          "constraints": {
+                            "foreignKeyName": "fk_user_who_park_id",
+                            "referencedTableName": "users",
+                            "referencedColumnNames": "id",
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
                           "name": "park_start_time",
                           "type": "datetime",
                           "constraints": {
