@@ -1,38 +1,26 @@
 var express = require("express");
 var router = express.Router();
 const { PreparedStatement: PS } = require("pg-promise");
-const { db } = require("../public/db/db");
 const createHttpError = require("http-errors");
 const { isUUID } = require("../services/uuid-service");
 const carService = require("../services/car-service");
 
+router.get("/:carId", async (req, res, next) => {
+  const carId = req.params.carId;
 
-router.get("/:id", function (req, res, next) {
-  const id = req.params.id;
-
-  if (!isUUID(id)) {
+  if (!isUUID(carId)) {
     next(createHttpError(400, "UUID is not valid"));
     return;
   }
 
-  const findCar = new PS({
-    name: "find-single-car",
-    text: "SELECT * FROM cars WHERE id = $1",
-    values: [id],
-  });
+  const car = await carService.getCar(carId);
 
-  db.oneOrNone(findCar)
-    .then(function (data) {
-      if(!data) {
-        next(createHttpError(404, "Car not found"));
-        return;
-      }
+  if (!car) {
+    next(createHttpError(404, "Car not found"));
+    return;
+  }
 
-      res.send(data);
-    })
-    .catch(function (error) {
-      next(createHttpError(500, "Unexpected error occured"));
-    });
+  res.send(car);
 });
 
 router.post("/", async (req, res, next) => {
