@@ -15,7 +15,8 @@
                           "type": "uuid",
                           "constraints": {
                             "primaryKey": true,
-                            "nullable": false
+                            "nullable": false,
+                            "unique": true
                           }
                         }
                       },

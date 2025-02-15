@@ -38,11 +38,18 @@
                 },
                 {
                   "addPrimaryKey": {
-                      "columnNames": "user_id, car_id",
-                      "constraintName": "pk_user_car",
-                      "tableName": "users_cars"
+                    "columnNames": "user_id, car_id",
+                    "constraintName": "pk_user_car",
+                    "tableName": "users_cars"
                   }
-              }
+                },
+                {
+                  "addUniqueConstraint": {
+                    "constraintName": "unique_car_for_user",
+                    "tableName": "users_cars",
+                    "columnNames": "user_id, car_id"
+                  }
+                }
               ]
             }
         }
