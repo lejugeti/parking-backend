@@ -37,6 +37,16 @@
                             "nullable": false
                           }
                         }
+                      },
+                      {
+                        "column": {
+                          "name": "password_salt",
+                          "type": "varchar(50)",
+                          "constraints": {
+                            "nullable": false,
+                            "unique": true
+                          }
+                        }
                       }
                     ]
                   }
