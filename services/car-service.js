@@ -25,7 +25,7 @@ carService.getCarUsers = async (carId) => {
 };
 
 carService.createCar = async (carName, userId) => {
-  const user = await userService.getUser(userId);
+  const user = await userService.getUserById(userId);
 
   if (!user) {
     throw new Error("User does not exist");
