@@ -31,8 +31,8 @@
                       },
                       {
                         "column": {
-                          "name": "password",
-                          "type": "varchar(50)",
+                          "name": "password_hash",
+                          "type": "varchar(100)",
                           "constraints": {
                             "nullable": false
                           }
