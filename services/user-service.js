@@ -15,6 +15,20 @@ class UserService {
 
     return db.oneOrNone(findUser);
   }
+
+  getUserByLogin(login) {
+    if (!login) {
+      throw new Error("User login can not be null");
+    }
+
+    const findUser = new PS({
+      name: "get-user-by-login",
+      text: "select * from users where login = $1",
+      values: [login],
+    });
+
+    return db.oneOrNone(findUser);
+  }
 }
 
 module.exports = new UserService();
