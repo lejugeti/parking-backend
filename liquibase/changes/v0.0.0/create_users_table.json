@@ -25,7 +25,8 @@
                           "name": "login",
                           "type": "varchar(50)",
                           "constraints": {
-                            "nullable": false
+                            "nullable": false,
+                            "unique": true
                           }
                         }
                       },
