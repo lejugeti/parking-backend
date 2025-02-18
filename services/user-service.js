@@ -1,10 +1,11 @@
 const { PreparedStatement: PS } = require("pg-promise");
 const { db } = require("../public/db/db");
+const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 
 class UserService {
   getUserById(userId) {
     if (!userId) {
-      throw new Error("User id can not be null");
+      throw new IllegalArgumentError("User id can not be null");
     }
 
     const findUser = new PS({
@@ -18,7 +19,7 @@ class UserService {
 
   getUserByLogin(login) {
     if (!login) {
-      throw new Error("User login can not be null");
+      throw new IllegalArgumentError("User login can not be null");
     }
 
     const findUser = new PS({
