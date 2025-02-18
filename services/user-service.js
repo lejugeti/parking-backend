@@ -9,7 +9,7 @@ class UserService {
 
     const findUser = new PS({
       name: "get-user-by-id",
-      text: "select * from users where id = $1",
+      text: "select id, login, password_salt from users where id = $1",
       values: [userId],
     });
 
@@ -23,7 +23,7 @@ class UserService {
 
     const findUser = new PS({
       name: "get-user-by-login",
-      text: "select * from users where login = $1",
+      text: "select id, login, password_salt from users where login = $1",
       values: [login],
     });
 
