@@ -25,9 +25,6 @@
                           "name": "car_id",
                           "type": "uuid",
                           "constraints": {
-                            "foreignKeyName": "fk_car_id",
-                            "referencedTableName": "cars",
-                            "referencedColumnNames": "id",
                             "nullable": false
                           }
                         }
@@ -37,9 +34,15 @@
                           "name": "user_who_park_id",
                           "type": "uuid",
                           "constraints": {
-                            "foreignKeyName": "fk_user_who_park_id",
-                            "referencedTableName": "users",
-                            "referencedColumnNames": "id",
+                            "nullable": false
+                          }
+                        }
+                      },
+                      {
+                        "column": {
+                          "name": "creator_user_id",
+                          "type": "uuid",
+                          "constraints": {
                             "nullable": false
                           }
                         }
@@ -81,6 +84,30 @@
                         }
                       }
                     ]
+                  }
+                },
+                {
+                  "addForeignKeyConstraint": {
+                    "baseColumnNames": "car_id,user_who_park_id",
+                    "baseTableName": "park_location",
+                    "constraintName": "fk_user_parking_car",
+                    "onDelete": "RESTRICT",
+                    "onUpdate": "RESTRICT",
+                    "referencedColumnNames": "car_id,user_id",
+                    "referencedTableName": "users_cars",
+                    "validate": true
+                  }
+                },
+                {
+                  "addForeignKeyConstraint": {
+                    "baseColumnNames": "car_id,creator_user_id",
+                    "baseTableName": "park_location",
+                    "constraintName": "fk_user_registering_parking",
+                    "onDelete": "RESTRICT",
+                    "onUpdate": "RESTRICT",
+                    "referencedColumnNames": "car_id,user_id",
+                    "referencedTableName": "users_cars",
+                    "validate": true
                   }
                 }
               ]
