@@ -3,8 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var authenticationService = require("./services/authentication-service");
 
-var indexRouter = require('./routes/index');
+var indexRouter = require("./routes/index");
 var userRouter = require("./routes/user");
 var carRouter = require("./routes/car");
 
@@ -19,6 +20,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use(async function (req, res, next) {
+  const loggedIn = await authenticationService.reqIsAllowed(req);
+
+  if (!loggedIn) {
+    res.status(401);
+    res.send();
+    return;
+  }
+
+  next();
+});
 
 app.use("/", indexRouter);
 app.use("/user", userRouter);

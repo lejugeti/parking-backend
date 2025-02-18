@@ -1,18 +1,31 @@
 const encryptionService = require("./encryption-service");
 const userService = require("./user-service");
-
+const { Buffer } = require("node:buffer");
 
 class AuthenticationService {
-    
-    async isLoggedIn(login, password) {
-        const user = await userService.getUserByLogin(login);
+  async reqIsAllowed(request) {
+    const authHeader = request.header("authorization");
+    const credentials = authHeader.replace("Basic ", "");
+    const decodedCredentials = encryptionService.decodeBase64(credentials);
+    const splited = decodedCredentials.split(":");
+    const login = splited[0];
+    const password = splited[1];
 
-        if(!user) {
-            return false;
-        }
+    return this.isLoggedIn(login, password);
+  }
 
-        const passwordHashed = encryptionService.hashPasswordWithSalt(password, user.password_salt);
+  async isLoggedIn(login, password) {
+    const user = await userService.getUserByLogin(login);
 
-        return passwordHashed === user.password_hash;
+    if (!user) {
+      return false;
     }
+
+    const salt = Buffer.from(user.password_salt, "base64");
+    let passwordHashed = encryptionService.hashPasswordWithSalt(password, salt);
+
+    return passwordHashed === user.password_hash;
+  }
 }
+
+module.exports = new AuthenticationService();
