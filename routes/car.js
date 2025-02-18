@@ -2,13 +2,13 @@ var express = require("express");
 var router = express.Router();
 const { PreparedStatement: PS } = require("pg-promise");
 const createHttpError = require("http-errors");
-const { isUUID } = require("../services/uuid-service");
+const uuidService = require("../services/uuid-service");
 const carService = require("../services/car-service");
 
 router.get("/:carId", async (req, res, next) => {
   const carId = req.params.carId;
 
-  if (!isUUID(carId)) {
+  if (!uuidService.isUUID(carId)) {
     next(createHttpError(400, "UUID is not valid"));
     return;
   }
@@ -26,7 +26,7 @@ router.get("/:carId", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   const { userId, carName } = req.body;
 
-  if (!isUUID(userId)) {
+  if (!uuidService.isUUID(userId)) {
     next(createHttpError(400, "User id is invalid"));
     return;
   } else if (!carName || carName.length === 0) {
@@ -38,10 +38,9 @@ router.post("/", async (req, res, next) => {
     await carService.createCar(carName, userId);
 
     res.send();
-  } catch(err) {
+  } catch (err) {
     next(createHttpError(500, "Internal error while creating car"));
   }
-
 });
 
 module.exports = router;
