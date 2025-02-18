@@ -23,9 +23,15 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(async function (req, res, next) {
-  const loggedIn = await authenticationService.reqIsAllowed(req);
+  try {
+    let loggedIn = await authenticationService.reqIsAllowed(req);
 
-  if (!loggedIn) {
+    if (!loggedIn) {
+      res.status(401);
+      res.send();
+      return;
+    }
+  } catch (err) {
     res.status(401);
     res.send();
     return;
