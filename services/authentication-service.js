@@ -24,7 +24,15 @@ class AuthenticationService {
     const salt = Buffer.from(user.password_salt, "base64");
     let passwordHashed = encryptionService.hashPasswordWithSalt(password, salt);
 
-    return passwordHashed === user.password_hash;
+    const userAuthIsCorrect = new PS({
+      name: "verify-auth",
+      text: "select count(*) from users where id = $1 and login = $2 and password_hash = $3 and password_salt = $4",
+      values: [user.id, login, passwordHashed, user.password_salt],
+    });
+
+    const userNumberWithSameAuth = await db.one(userAuthIsCorrect);
+
+    return parseInt(userNumberWithSameAuth.count) === 1;
   }
 }
 
