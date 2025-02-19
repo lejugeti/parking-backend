@@ -50,7 +50,7 @@
                       {
                         "column": {
                           "name": "park_start_time",
-                          "type": "datetime",
+                          "type": "timestamp with time zone",
                           "constraints": {
                             "nullable": false
                           }
@@ -59,7 +59,7 @@
                       {
                         "column": {
                           "name": "park_end_time",
-                          "type": "datetime",
+                          "type": "timestamp with time zone",
                           "constraints": {
                             "nullable": true
                           }
