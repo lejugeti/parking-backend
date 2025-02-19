@@ -46,6 +46,26 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.get("/:carId/park-location", async (req, res, next) => {
+  const { carId } = req.params;
+
+  if (!uuidService.isUUID(carId)) {
+    next(createHttpError(400, "UUID is not valid"));
+    return;
+  }
+
+  const carCurrentParking = await parkLocationService.getCurrentParkLocation(
+    carId
+  );
+
+  if (!carCurrentParking) {
+    next(createHttpError(404, "Car parking location not found"));
+    return;
+  }
+
+  res.send(carCurrentParking);
+});
+
 router.post("/:carId/park-location", async (req, res, next) => {
   try {
     const { carId } = req.params;
