@@ -1,14 +1,14 @@
-const { db, transactionMode } = require("../public/db/db");
+const { db } = require("../public/db/db");
 const { PreparedStatement: PS } = require("pg-promise");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const carService = require("./car-service");
-const crypto = require("node:crypto")
+const crypto = require("node:crypto");
 const uuidService = require("../services/uuid-service");
 const dateService = require("./date-service");
 
 class ParkLocationService {
-  async createParkLocation(parkingCreator, parkLocation) {
-    const { carId, userWhoParkId, beginTime, timeLimit, location, reminder } =
+  async createParkLocation(carId, parkingCreator, parkLocation) {
+    const { userWhoParkId, beginTime, timeLimit, location, reminder } =
       parkLocation;
 
     if (!parkingCreator) {
