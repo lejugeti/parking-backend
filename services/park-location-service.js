@@ -4,7 +4,6 @@ const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const carService = require("./car-service");
 const crypto = require("node:crypto");
 const uuidService = require("../services/uuid-service");
-const dateService = require("./date-service");
 
 class ParkLocationService {
   async createParkLocation(carId, parkingCreator, parkLocation) {
@@ -23,9 +22,6 @@ class ParkLocationService {
       throw new IllegalArgumentError("Location is invalid");
     }
 
-    const parkingBeginning = dateService.formatDateTimeString(beginTime);
-    const parkingTimeLimit = dateService.formatDateTimeString(timeLimit);
-
     const carUsers = await carService.getCarUsers(carId);
     const creatorOwnsCar = carUsers.some(
       (user) => user.user_id === parkingCreator.id
@@ -41,6 +37,8 @@ class ParkLocationService {
     }
 
     const parkingId = crypto.randomUUID();
+    const parkingBeginning = new Date(beginTime);
+    const parkingTimeLimit = new Date(timeLimit);
 
     const createParkLocation = new PS({
       name: "create-park-location",
@@ -52,8 +50,8 @@ class ParkLocationService {
         carId,
         userWhoParkId,
         parkingCreator.id,
-        parkingBeginning,
-        parkingTimeLimit,
+        parkingBeginning.toISOString(),
+        parkingTimeLimit.toISOString(),
         location,
         reminder,
       ],
