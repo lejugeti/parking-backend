@@ -106,11 +106,6 @@ class ParkLocationService {
 
     const parkingBeginning = new Date(beginTime);
     const parkingTimeLimit = new Date(timeLimit);
-    console.log({
-      parkingBeginning,
-      parkingTimeLimit,
-      cond: parkingBeginning > parkingTimeLimit,
-    });
     if (parkingBeginning > parkingTimeLimit) {
       throw new IllegalArgumentError(
         "Parking beginning can not be later than end time"
