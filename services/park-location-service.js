@@ -40,6 +40,11 @@ class ParkLocationService {
     const parkingId = crypto.randomUUID();
     const parkingBeginning = new Date(beginTime);
     const parkingTimeLimit = new Date(timeLimit);
+    if (parkingBeginning > parkingTimeLimit) {
+      throw new IllegalArgumentError(
+        "Parking beginning can not be later than end time"
+      );
+    }
 
     const createParkLocation = new PS({
       name: "create-park-location",
