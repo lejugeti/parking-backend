@@ -1,6 +1,7 @@
 const { db } = require("../public/db/db");
 const { PreparedStatement: PS } = require("pg-promise");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
+const NotFoundError = require("../public/errors/not-found.error");
 const carService = require("./car-service");
 const crypto = require("node:crypto");
 const uuidService = require("../services/uuid-service");
@@ -58,6 +59,81 @@ class ParkLocationService {
     });
 
     return db.none(createParkLocation);
+  }
+
+  async updateParkLocation(carId, parkingId, parkingUpdater, parkLocation) {
+    const currentParkingState = await this.getParkLocationById(parkingId);
+
+    if (!currentParkingState) {
+      throw new NotFoundError("Parking location does not exists");
+    }
+
+    const { userWhoParkId, beginTime, timeLimit, location, reminder } =
+      parkLocation;
+
+    if (!parkingUpdater) {
+      throw new IllegalArgumentError("Updater user can not be null");
+    } else if (!uuidService.isUUID(carId)) {
+      throw new IllegalArgumentError("Car parked id is invalid");
+    } else if (!uuidService.isUUID(parkingId)) {
+      throw new IllegalArgumentError("Parking location id is invalid");
+    } else if (!uuidService.isUUID(userWhoParkId)) {
+      throw new IllegalArgumentError("User id is invalid");
+    } else if (!beginTime || beginTime.length === 0) {
+      throw new IllegalArgumentError("Parking time is invalid");
+    } else if (!location || location.length === 0) {
+      throw new IllegalArgumentError("Location is invalid");
+    }
+
+    const carUsers = await carService.getCarUsers(carId);
+    const updaterOwnsCar = carUsers.some(
+      (user) => user.user_id === parkingUpdater.id
+    );
+    const parkerOwnsCar = carUsers.some(
+      (user) => user.user_id === userWhoParkId
+    );
+
+    if (!updaterOwnsCar) {
+      throw new IllegalArgumentError("Updater does not own the car");
+    } else if (!parkerOwnsCar) {
+      throw new IllegalArgumentError("User who parks does not own the car");
+    }
+
+    const parkingBeginning = new Date(beginTime);
+    const parkingTimeLimit = new Date(timeLimit);
+    console.log({
+      parkingBeginning,
+      parkingTimeLimit,
+      cond: parkingBeginning > parkingTimeLimit,
+    });
+    if (parkingBeginning > parkingTimeLimit) {
+      throw new IllegalArgumentError(
+        "Parking beginning can not be later than end time"
+      );
+    }
+
+    const updateParkLocation = new PS({
+      name: "update-park-location",
+      text: `update park_location
+        set user_who_park_id = $1,
+          creator_user_id = $2,
+          park_start_time = $3,
+          park_end_time = $4,
+          location = $5,
+          reminder = $6
+        where id = $7;`,
+      values: [
+        userWhoParkId,
+        parkingUpdater.id,
+        parkingBeginning.toISOString(),
+        parkingTimeLimit.toISOString(),
+        location,
+        reminder,
+        parkingId,
+      ],
+    });
+
+    return db.none(updateParkLocation);
   }
 
   getCurrentParkLocation(carId) {
