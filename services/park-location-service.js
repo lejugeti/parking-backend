@@ -76,6 +76,20 @@ class ParkLocationService {
 
     return db.oneOrNone(carCurrentLocationRequest);
   }
+
+  getParkLocationById(parkLocationId) {
+    if (!uuidService.isUUID(parkLocationId)) {
+      throw new IllegalArgumentError("Park location id is invalid");
+    }
+
+    const carCurrentLocationRequest = new PS({
+      name: "get-parking-location-by-id",
+      text: `select * from park_location where id = $1;`,
+      values: [parkLocationId],
+    });
+
+    return db.oneOrNone(carCurrentLocationRequest);
+  }
 }
 
 module.exports = new ParkLocationService();
