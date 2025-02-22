@@ -1,6 +1,8 @@
+const uuidService = require("../services/uuid-service");
 const { PreparedStatement: PS } = require("pg-promise");
 const { db } = require("../public/db/db");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
+const NotFoundError = require("../public/errors/not-found.error");
 
 class UserService {
   getUserById(userId) {
@@ -29,6 +31,28 @@ class UserService {
     });
 
     return db.oneOrNone(findUser);
+  }
+
+  async modifyUsername(userId, username) {
+    if (!uuidService.isUUID(userId)) {
+      throw new IllegalArgumentError("User id is invalid");
+    } else if (!username || username.length === 0) {
+      throw new IllegalArgumentError("Username can not be null or blank");
+    }
+
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError("User does not exist");
+    }
+
+    const updateUserName = new PS({
+      name: "update-user-name",
+      text: `update users set username = $1 where id = $2;`,
+      values: [username, userId],
+    });
+
+    await db.none(updateUserName);
   }
 }
 
