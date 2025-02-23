@@ -7,7 +7,6 @@ var helmet = require("helmet");
 
 var authenticationService = require("./services/authentication-service");
 
-var indexRouter = require("./routes/index");
 var userRouter = require("./routes/user");
 var carRouter = require("./routes/car");
 
@@ -42,7 +41,6 @@ app.use(async function (req, res, next) {
   next();
 });
 
-app.use("/", indexRouter);
 app.use("/user", userRouter);
 app.use("/car", carRouter);
 
