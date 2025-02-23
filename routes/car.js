@@ -10,6 +10,9 @@ const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
 const UnauthorizedError = require("../public/errors/unauthorized.error");
 
+/**
+ * Get car informations
+ */
 router.get("/:carId", async (req, res, next) => {
   const carId = req.params.carId;
 
@@ -28,6 +31,9 @@ router.get("/:carId", async (req, res, next) => {
   res.send(car);
 });
 
+/**
+ * Update car informations
+ */
 router.put("/:carId", async (req, res, next) => {
   const { carId } = req.params;
 
@@ -61,6 +67,9 @@ router.put("/:carId", async (req, res, next) => {
   }
 });
 
+/**
+ * Add user to car
+ */
 router.post("/:carId/user", async (req, res, next) => {
   const { carId } = req.params;
   const { userId } = req.body;
@@ -92,6 +101,9 @@ router.post("/:carId/user", async (req, res, next) => {
   }
 });
 
+/**
+ * Delete user from car
+ */
 router.delete("/:carId/user/:userId", async (req, res, next) => {
   const { carId, userId } = req.params;
 
@@ -122,6 +134,9 @@ router.delete("/:carId/user/:userId", async (req, res, next) => {
   }
 });
 
+/**
+ * Get car's parking location informations
+ */
 router.get("/:carId/park-location", async (req, res, next) => {
   const { carId } = req.params;
 
@@ -142,6 +157,9 @@ router.get("/:carId/park-location", async (req, res, next) => {
   res.send(carCurrentParking);
 });
 
+/**
+ * Create park location for specific car
+ */
 router.post("/:carId/park-location", async (req, res, next) => {
   try {
     const { carId } = req.params;
@@ -168,6 +186,9 @@ router.post("/:carId/park-location", async (req, res, next) => {
   }
 });
 
+/**
+ * Update parking location informations
+ */
 router.put("/:carId/park-location/:parkLocationId", async (req, res, next) => {
   try {
     const { carId, parkLocationId } = req.params;

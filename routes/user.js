@@ -7,6 +7,9 @@ const userService = require("../services/user-service");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
 
+/**
+ * Update username
+ */
 router.put("/:userId/username", async (req, res, next) => {
   const { userId } = req.params;
   const { username } = req.body;
@@ -37,6 +40,9 @@ router.put("/:userId/username", async (req, res, next) => {
   }
 });
 
+/**
+ * Get user's car list
+ */
 router.get("/:userId/car-list", async (req, res, next) => {
   const { userId } = req.params;
 
@@ -58,6 +64,9 @@ router.get("/:userId/car-list", async (req, res, next) => {
   }
 });
 
+/**
+ * Create a car for specific user
+ */
 router.post("/:userId/car", async (req, res, next) => {
   const { userId } = req.params;
   const { carName } = req.body;
