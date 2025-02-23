@@ -86,4 +86,25 @@ router.put("/:userId/car/:carId", async (req, res, next) => {
   }
 });
 
+router.get("/:userId/car-list", async (req, res, next) => {
+  const { userId } = req.params;
+
+  if (!uuidService.isUUID(userId)) {
+    next(createHttpError(400, "User id is invalid"));
+    return;
+  }
+
+  try {
+    const userCars = await userService.getUserCars(userId);
+    res.send(userCars);
+  } catch (err) {
+    if (err instanceof IllegalArgumentError) {
+      next(createHttpError(400, err.message));
+      return;
+    }
+
+    next(createHttpError(500, "Internal error while fetching user cars"));
+  }
+});
+
 module.exports = router;

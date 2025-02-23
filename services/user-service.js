@@ -54,6 +54,20 @@ class UserService {
 
     await db.none(updateUserName);
   }
+
+  getUserCars(userId) {
+    if (!uuidService.isUUID(userId)) {
+      throw new IllegalArgumentError("User id is invalid");
+    }
+
+    const getUserCarsReq = new PS({
+      name: "get-user-cars",
+      text: "select * from users_cars where user_id = $1",
+      values: [userId],
+    });
+
+    return db.manyOrNone(getUserCarsReq);
+  }
 }
 
 module.exports = new UserService();
