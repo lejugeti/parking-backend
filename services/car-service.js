@@ -2,6 +2,7 @@ const { db, transactionMode,  } = require("../public/db/db");
 const { PreparedStatement: PS } = require("pg-promise");
 const userService = require("./user-service");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
+const NotFoundError = require("../public/errors/not-found.error");
 
 class CarService {
   async getCar(carId) {
@@ -24,11 +25,13 @@ class CarService {
     return db.manyOrNone(retrieveCarUsers);
   }
 
-  async createCar(carName, userId) {
+  async createCarForUser(carName, userId) {
     const user = await userService.getUserById(userId);
 
     if (!user) {
-      throw new Error("User does not exist");
+      throw new NotFoundError("User does not exist");
+    } else if (!carName || carName.length === 0) {
+      throw new IllegalArgumentError("Car name is invalid");
     }
 
     return db.tx(transactionMode, async (transaction) => {
