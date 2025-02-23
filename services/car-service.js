@@ -70,8 +70,15 @@ class CarService {
   async updateCar(carId, carUpdated) {
     const { carName } = carUpdated;
 
-    if (!carName || carName.length === 0) {
+    if (!uuidService.isUUID(carId)) {
+      throw new IllegalArgumentError("Car id is invalid");
+    } else if (!carName || carName.length === 0) {
       throw new IllegalArgumentError("Car name can not be null or blank");
+    }
+
+    const car = await this.getCar(carId);
+    if (!car) {
+      throw new NotFoundError("Car does not exist");
     }
 
     const updateCarReq = new PS({

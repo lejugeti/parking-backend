@@ -27,6 +27,39 @@ router.get("/:carId", async (req, res, next) => {
   res.send(car);
 });
 
+router.put("/:carId", async (req, res, next) => {
+  const { carId } = req.params;
+
+  if (!uuidService.isUUID(carId)) {
+    next(createHttpError(400, "Car id is invalid"));
+    return;
+  }
+
+  try {
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const user = await userService.getUserByLogin(login);
+    const carUsers = await carService.getCarUsers(carId);
+
+    if (!carUsers.some((carUser) => carUser.user_id === user.id)) {
+      next(createHttpError(403, "User does not own the car"));
+      return;
+    }
+
+    await carService.updateCar(carId, req.body);
+    res.send();
+  } catch (err) {
+    if (err instanceof IllegalArgumentError) {
+      next(createHttpError(400, err.message));
+      return;
+    } else if (err instanceof NotFoundError) {
+      next(createHttpError(404, err.message));
+      return;
+    }
+
+    next(createHttpError(500, "Internal error while updating car"));
+  }
+});
+
 router.get("/:carId/park-location", async (req, res, next) => {
   const { carId } = req.params;
 
