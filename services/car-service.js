@@ -1,6 +1,7 @@
 const { db, transactionMode,  } = require("../public/db/db");
 const { PreparedStatement: PS } = require("pg-promise");
 const userService = require("./user-service");
+const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 
 class CarService {
   async getCar(carId) {
@@ -61,6 +62,22 @@ class CarService {
     });
 
     await db.none(deleteCarReq);
+  }
+
+  async updateCar(carId, carUpdated) {
+    const { carName } = carUpdated;
+
+    if (!carName || carName.length === 0) {
+      throw new IllegalArgumentError("Car name can not be null or blank");
+    }
+
+    const updateCarReq = new PS({
+      name: "update-car",
+      text: "update cars set name = $1 where id = $2",
+      values: [carName, carId],
+    });
+
+    await db.none(updateCarReq);
   }
 
   async deleteCarForUser(userId, carId) {

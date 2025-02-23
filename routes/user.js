@@ -56,4 +56,34 @@ router.delete("/:userId/car/:carId", async (req, res, next) => {
   }
 });
 
+router.put("/:userId/car/:carId", async (req, res, next) => {
+  const { userId, carId } = req.params;
+
+  if (!uuidService.isUUID(userId)) {
+    next(createHttpError(400, "User id is invalid"));
+    return;
+  } else if (!uuidService.isUUID(carId)) {
+    next(createHttpError(400, "Car id is invalid"));
+    return;
+  }
+
+  const carUsers = await carService.getCarUsers(carId);
+  if (!carUsers.some((carUser) => carUser.user_id === userId)) {
+    next(createHttpError(403, "User does not own the car"));
+    return;
+  }
+
+  try {
+    await carService.updateCar(carId, req.body);
+    res.send();
+  } catch (err) {
+    if (err instanceof IllegalArgumentError) {
+      next(createHttpError(400, err.message));
+      return;
+    }
+
+    next(createHttpError(500, "Internal error while updating car"));
+  }
+});
+
 module.exports = router;
