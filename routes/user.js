@@ -37,25 +37,6 @@ router.put("/:userId/username", async (req, res, next) => {
   }
 });
 
-router.delete("/:userId/car/:carId", async (req, res, next) => {
-  const { userId, carId } = req.params;
-
-  if (!uuidService.isUUID(userId)) {
-    next(createHttpError(400, "User id is invalid"));
-    return;
-  } else if (!uuidService.isUUID(carId)) {
-    next(createHttpError(400, "Car id is invalid"));
-    return;
-  }
-
-  try {
-    await carService.deleteCarForUser(userId, carId);
-    res.send();
-  } catch (err) {
-    next(createHttpError(500, "Internal error while deleting car"));
-  }
-});
-
 router.get("/:userId/car-list", async (req, res, next) => {
   const { userId } = req.params;
 

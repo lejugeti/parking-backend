@@ -92,6 +92,36 @@ router.post("/:carId/user", async (req, res, next) => {
   }
 });
 
+router.delete("/:carId/user/:userId", async (req, res, next) => {
+  const { carId, userId } = req.params;
+
+  try {
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const updaterUser = await userService.getUserByLogin(login);
+
+    await carService.deleteUserForCar(userId, carId, updaterUser.id);
+    res.status(200);
+    res.send();
+  } catch (err) {
+    if (err instanceof IllegalArgumentError) {
+      next(createHttpError(400, err.message));
+      return;
+    } else if (err instanceof UnauthorizedError) {
+      next(createHttpError(403, err.message));
+      return;
+    } else if (err instanceof NotFoundError) {
+      next(createHttpError(404, err.message));
+      return;
+    }
+
+    console.error(err);
+
+    next(
+      createHttpError(500, "Internal error occured while adding user to car")
+    );
+  }
+});
+
 router.get("/:carId/park-location", async (req, res, next) => {
   const { carId } = req.params;
 

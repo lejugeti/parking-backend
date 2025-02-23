@@ -124,16 +124,29 @@ class CarService {
     await db.none(insertUserCarReq);
   }
 
-  async deleteCarForUser(userId, carId) {
-    const deleteCarForUser = new PS({
-      name: "delete-car-for-user",
+  async deleteUserForCar(userIdToDelete, carId, updaterId) {
+    if (!uuidService.isUUID(carId)) {
+      throw new IllegalArgumentError("Car UUID is not valid");
+    } else if (!uuidService.isUUID(userIdToDelete)) {
+      throw new IllegalArgumentError("User to delete UUID is not valid");
+    } else if (!uuidService.isUUID(updaterId)) {
+      throw new IllegalArgumentError("Updater user UUID is not valid");
+    }
+
+    let usersForCar = await this.getCarUsers(carId);
+    if (!usersForCar.some((u) => u.user_id === updaterId)) {
+      throw new UnauthorizedError("Updater does not own car");
+    }
+
+    const deleteUserForCar = new PS({
+      name: "delete-user-for-car",
       text: "delete from users_cars where user_id = $1 and car_id = $2",
-      values: [userId, carId],
+      values: [userIdToDelete, carId],
     });
 
-    await db.none(deleteCarForUser);
+    await db.none(deleteUserForCar);
 
-    const usersForCar = await getCarUsers(carId);
+    usersForCar = await getCarUsers(carId);
 
     if (usersForCar.length === 0) {
       await deleteCar(carId);
