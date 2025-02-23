@@ -3,6 +3,8 @@ const { PreparedStatement: PS } = require("pg-promise");
 const userService = require("./user-service");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
+const UnauthorizedError = require("../public/errors/unauthorized.error");
+const uuidService = require("./uuid-service");
 
 class CarService {
   async getCar(carId) {
@@ -88,6 +90,38 @@ class CarService {
     });
 
     await db.none(updateCarReq);
+  }
+
+  async addUserOnCar(userAddedId, carId, creatorUserId) {
+    if (!uuidService.isUUID(carId)) {
+      throw new IllegalArgumentError("Car UUID is not valid");
+    } else if (!uuidService.isUUID(userAddedId)) {
+      throw new IllegalArgumentError("User UUID is not valid");
+    } else if (!uuidService.isUUID(creatorUserId)) {
+      throw new IllegalArgumentError("Creator user UUID is not valid");
+    }
+
+    const user = await userService.getUserById(userAddedId);
+    if (!user) {
+      throw new NotFoundError("User added does not exist");
+    }
+
+    const usersForCar = await this.getCarUsers(carId);
+    if (!usersForCar.some((u) => u.user_id === creatorUserId)) {
+      throw new UnauthorizedError("Creator does not own car");
+    } else if (usersForCar.some((u) => u.user_id === userAddedId)) {
+      throw new UnauthorizedError("User is already added to car");
+    } else if (userAddedId === creatorUserId) {
+      throw new UnauthorizedError("Creator can not add himself to car");
+    }
+
+    const insertUserCarReq = new PS({
+      name: "insert-user-car-relationship",
+      text: "insert into users_cars (user_id, car_id) values ($1, $2)",
+      values: [userAddedId, carId],
+    });
+
+    await db.none(insertUserCarReq);
   }
 
   async deleteCarForUser(userId, carId) {

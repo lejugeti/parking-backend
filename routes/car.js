@@ -8,6 +8,7 @@ const authenticationService = require("../services/authentication-service");
 const userService = require("../services/user-service");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
+const UnauthorizedError = require("../public/errors/unauthorized.error");
 
 router.get("/:carId", async (req, res, next) => {
   const carId = req.params.carId;
@@ -57,6 +58,37 @@ router.put("/:carId", async (req, res, next) => {
     }
 
     next(createHttpError(500, "Internal error while updating car"));
+  }
+});
+
+router.post("/:carId/user", async (req, res, next) => {
+  const { carId } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const creatorUser = await userService.getUserByLogin(login);
+
+    await carService.addUserOnCar(userId, carId, creatorUser.id);
+    res.status(201);
+    res.send();
+  } catch (err) {
+    if (err instanceof IllegalArgumentError) {
+      next(createHttpError(400, err.message));
+      return;
+    } else if (err instanceof UnauthorizedError) {
+      next(createHttpError(403, err.message));
+      return;
+    } else if (err instanceof NotFoundError) {
+      next(createHttpError(404, err.message));
+      return;
+    }
+
+    console.error(err);
+
+    next(
+      createHttpError(500, "Internal error occured while adding user to car")
+    );
   }
 });
 
