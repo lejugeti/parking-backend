@@ -62,7 +62,9 @@ class UserService {
 
     const getUserCarsReq = new PS({
       name: "get-user-cars",
-      text: "select * from users_cars where user_id = $1",
+      text: `select id, name from users_cars uc 
+              inner join cars c on (uc.car_id = c.id)
+              where user_id = $1`,
       values: [userId],
     });
 

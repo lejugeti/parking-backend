@@ -1,6 +1,5 @@
 const { db, transactionMode,  } = require("../public/db/db");
 const { PreparedStatement: PS } = require("pg-promise");
-const userService = require("./user-service");
 const uuidService = require("./uuid-service");
 const crypto = require("node:crypto");
 
@@ -52,11 +51,13 @@ class CarService {
   }
 
   async createCarForUser(carName, userId) {
-    const user = await userService.getUserById(userId);
+    try {
+      await this.authorizationValidator.validate(new UserExists(db, userId));
+    } catch (err) {
+      throw err;
+    }
 
-    if (!user) {
-      throw new NotFoundError("User does not exist");
-    } else if (!carName || carName.length === 0) {
+    if (!carName || carName.length === 0) {
       throw new IllegalArgumentError("Car name is invalid");
     }
 
