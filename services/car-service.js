@@ -4,11 +4,17 @@ const userService = require("./user-service");
 const uuidService = require("./uuid-service");
 const crypto = require("node:crypto");
 
+const AuthorizationValidator = require("../services/authorizations/authorizations-validator");
+const UserHasCar = require("../services/authorizations/authorization-commands/user-has-car");
+const UserNotAlreadyAddedToCar = require("./authorizations/authorization-commands/user-not-already-added-to-car");
+const UserExists = require("../services/authorizations/authorization-commands/user-exists");
+
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
-const UnauthorizedError = require("../public/errors/unauthorized.error");
 
 class CarService {
+  authorizationValidator = new AuthorizationValidator();
+
   async getCar(carId) {
     return await db.tx(transactionMode, async () => {
       const findCar = new PS({
@@ -119,18 +125,16 @@ class CarService {
       throw new IllegalArgumentError("Creator user UUID is not valid");
     }
 
-    const user = await userService.getUserById(userAddedId);
-    if (!user) {
-      throw new NotFoundError("User added does not exist");
-    }
-
-    const usersForCar = await this.getCarUsers(carId);
-    if (!usersForCar.some((u) => u.id === creatorUserId)) {
-      throw new UnauthorizedError("Creator does not own car");
-    } else if (usersForCar.some((u) => u.id === userAddedId)) {
-      throw new UnauthorizedError("User is already added to car");
-    } else if (userAddedId === creatorUserId) {
-      throw new UnauthorizedError("Creator can not add himself to car");
+    try {
+      await this.authorizationValidator.validate(
+        new UserExists(db, creatorUserId),
+        new UserExists(db, userAddedId),
+        new UserHasCar(db, creatorUserId, carId),
+        new UserNotAlreadyAddedToCar(db, creatorUserId, carId),
+        new UserNotAlreadyAddedToCar(db, userAddedId, carId)
+      );
+    } catch (err) {
+      throw err;
     }
 
     const insertUserCarReq = new PS({
@@ -151,9 +155,12 @@ class CarService {
       throw new IllegalArgumentError("Updater user UUID is not valid");
     }
 
-    let usersForCar = await this.getCarUsers(carId);
-    if (!usersForCar.some((u) => u.id === updaterId)) {
-      throw new UnauthorizedError("Updater does not own car");
+    try {
+      await this.authorizationValidator.validate(
+        new UserHasCar(db, creatorUserId, carId)
+      );
+    } catch (err) {
+      throw err;
     }
 
     const deleteUserForCar = new PS({
