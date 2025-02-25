@@ -200,7 +200,6 @@ class CarService {
       (user) => user.id === parkingCreator.id
     );
     const parkerOwnsCar = carUsers.some((user) => user.id === userWhoParkId);
-    console.log({ carUsers });
 
     if (!creatorOwnsCar) {
       throw new IllegalArgumentError("User does not own the car");
