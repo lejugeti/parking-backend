@@ -30,9 +30,9 @@ router.put("/:userId/username", async (req, res, next) => {
   }
 
   try {
-    await authValidator.validate(
-      new UserTargetsItself(authenticationService, db, req, userId)
-    );
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const user = await userService.getUserByLogin(login);
+    await authValidator.validate(new UserTargetsItself(db, user.id, userId));
 
     await userService.modifyUsername(userId, username);
     res.send();
@@ -66,9 +66,9 @@ router.get("/:userId/car-list", async (req, res, next) => {
   }
 
   try {
-    await authValidator.validate(
-      new UserTargetsItself(authenticationService, db, req, userId)
-    );
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const user = await userService.getUserByLogin(login);
+    await authValidator.validate(new UserTargetsItself(db, user.id, userId));
 
     const userCars = await userService.getUserCars(userId);
     res.send(userCars);
@@ -101,9 +101,9 @@ router.post("/:userId/car", async (req, res, next) => {
   }
 
   try {
-    await authValidator.validate(
-      new UserTargetsItself(authenticationService, db, req, userId)
-    );
+    const login = authenticationService.getAuthFromRequest(req).login;
+    const user = await userService.getUserByLogin(login);
+    await authValidator.validate(new UserTargetsItself(db, user.id, userId));
 
     await await carService.createCarForUser(carName, userId);
     res.send();

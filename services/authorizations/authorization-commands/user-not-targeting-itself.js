@@ -1,6 +1,6 @@
 const UnauthorizedError = require("../../../public/errors/unauthorized.error");
 
-class UserTargetsItself {
+class UserNotTargetingItself {
   db = undefined;
   requesterId = undefined;
   targetId = undefined;
@@ -12,12 +12,12 @@ class UserTargetsItself {
   }
 
   async authorize() {
-    if (this.requesterId !== this.targetId) {
+    if (this.requesterId === this.targetId) {
       throw new UnauthorizedError(
-        "User can not target another user for this operation"
+        "User can not target itself for this operation"
       );
     }
   }
 }
 
-module.exports = UserTargetsItself;
+module.exports = UserNotTargetingItself;
