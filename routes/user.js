@@ -6,6 +6,13 @@ const carService = require("../services/car-service");
 const userService = require("../services/user-service");
 const IllegalArgumentError = require("../public/errors/illegal-argument.error");
 const NotFoundError = require("../public/errors/not-found.error");
+const AuthorizationValidator = require("../services/authorizations/authorizations-validator");
+const UserTargetsItself = require("../services/authorizations/authorization-commands/user-targets-itself");
+const authenticationService = require("../services/authentication-service");
+const { db } = require("../public/db/db");
+const UnauthorizedError = require("../public/errors/unauthorized.error");
+
+const authValidator = new AuthorizationValidator();
 
 /**
  * Update username
@@ -23,6 +30,10 @@ router.put("/:userId/username", async (req, res, next) => {
   }
 
   try {
+    await authValidator.validate(
+      new UserTargetsItself(authenticationService, db, req, userId)
+    );
+
     await userService.modifyUsername(userId, username);
     res.send();
   } catch (err) {
@@ -31,6 +42,9 @@ router.put("/:userId/username", async (req, res, next) => {
       return;
     } else if (err instanceof NotFoundError) {
       next(createHttpError(404, err.message));
+      return;
+    } else if (err instanceof UnauthorizedError) {
+      next(createHttpError(403, err.message));
       return;
     }
 
@@ -52,11 +66,18 @@ router.get("/:userId/car-list", async (req, res, next) => {
   }
 
   try {
+    await authValidator.validate(
+      new UserTargetsItself(authenticationService, db, req, userId)
+    );
+
     const userCars = await userService.getUserCars(userId);
     res.send(userCars);
   } catch (err) {
     if (err instanceof IllegalArgumentError) {
       next(createHttpError(400, err.message));
+      return;
+    } else if (err instanceof UnauthorizedError) {
+      next(createHttpError(403, err.message));
       return;
     }
 
@@ -80,7 +101,11 @@ router.post("/:userId/car", async (req, res, next) => {
   }
 
   try {
-    await carService.createCarForUser(carName, userId);
+    await authValidator.validate(
+      new UserTargetsItself(authenticationService, db, req, userId)
+    );
+
+    await await carService.createCarForUser(carName, userId);
     res.send();
   } catch (err) {
     if (err instanceof IllegalArgumentError) {
@@ -88,6 +113,9 @@ router.post("/:userId/car", async (req, res, next) => {
       return;
     } else if (err instanceof NotFoundError) {
       next(createHttpError(404, err.message));
+      return;
+    } else if (err instanceof UnauthorizedError) {
+      next(createHttpError(403, err.message));
       return;
     }
 
