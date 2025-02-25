@@ -126,18 +126,6 @@ class CarService {
       throw new IllegalArgumentError("Creator user UUID is not valid");
     }
 
-    try {
-      await this.authorizationValidator.validate(
-        new UserExists(db, creatorUserId),
-        new UserExists(db, userAddedId),
-        new UserHasCar(db, creatorUserId, carId),
-        new UserNotAlreadyAddedToCar(db, creatorUserId, carId),
-        new UserNotAlreadyAddedToCar(db, userAddedId, carId)
-      );
-    } catch (err) {
-      throw err;
-    }
-
     const insertUserCarReq = new PS({
       name: "insert-user-car-relationship",
       text: "insert into users_cars (user_id, car_id) values ($1, $2)",
@@ -156,27 +144,22 @@ class CarService {
       throw new IllegalArgumentError("Updater user UUID is not valid");
     }
 
-    try {
-      await this.authorizationValidator.validate(
-        new UserHasCar(db, creatorUserId, carId)
-      );
-    } catch (err) {
-      throw err;
-    }
+    return db.tx(transactionMode, async (t) => {
+      const deleteUserForCar = new PS({
+        name: "delete-user-for-car",
+        text: "delete from users_cars where user_id = $1 and car_id = $2",
+        values: [userIdToDelete, carId],
+      });
 
-    const deleteUserForCar = new PS({
-      name: "delete-user-for-car",
-      text: "delete from users_cars where user_id = $1 and car_id = $2",
-      values: [userIdToDelete, carId],
+      await t.none(deleteUserForCar);
+
+      const usersForCar = await this.getCarUsers(carId);
+
+      if (usersForCar.length === 0) {
+        await deleteCar(carId);
+      }
     });
-
-    await db.none(deleteUserForCar);
-
-    usersForCar = await getCarUsers(carId);
-
-    if (usersForCar.length === 0) {
-      await deleteCar(carId);
-    }
+    
   }
 
   async createParkLocation(carId, parkingCreator, parkLocation) {
@@ -258,18 +241,6 @@ class CarService {
       throw new IllegalArgumentError("Parking time is invalid");
     } else if (!location || location.length === 0) {
       throw new IllegalArgumentError("Location is invalid");
-    }
-
-    const carUsers = await this.getCarUsers(carId);
-    const updaterOwnsCar = carUsers.some(
-      (user) => user.id === parkingUpdater.id
-    );
-    const parkerOwnsCar = carUsers.some((user) => user.id === userWhoParkId);
-
-    if (!updaterOwnsCar) {
-      throw new IllegalArgumentError("Updater does not own the car");
-    } else if (!parkerOwnsCar) {
-      throw new IllegalArgumentError("User who parks does not own the car");
     }
 
     const parkingBeginning = new Date(beginTime);
