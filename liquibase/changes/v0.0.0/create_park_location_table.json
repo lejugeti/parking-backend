@@ -88,25 +88,25 @@
                 },
                 {
                   "addForeignKeyConstraint": {
-                    "baseColumnNames": "car_id,user_who_park_id",
+                    "baseColumnNames": "user_who_park_id",
                     "baseTableName": "park_location",
                     "constraintName": "fk_user_parking_car",
                     "onDelete": "RESTRICT",
                     "onUpdate": "RESTRICT",
-                    "referencedColumnNames": "car_id,user_id",
-                    "referencedTableName": "users_cars",
+                    "referencedColumnNames": "id",
+                    "referencedTableName": "users",
                     "validate": true
                   }
                 },
                 {
                   "addForeignKeyConstraint": {
-                    "baseColumnNames": "car_id,creator_user_id",
+                    "baseColumnNames": "creator_user_id",
                     "baseTableName": "park_location",
                     "constraintName": "fk_user_registering_parking",
                     "onDelete": "RESTRICT",
                     "onUpdate": "RESTRICT",
-                    "referencedColumnNames": "car_id,user_id",
-                    "referencedTableName": "users_cars",
+                    "referencedColumnNames": "id",
+                    "referencedTableName": "users",
                     "validate": true
                   }
                 }
