@@ -7,3 +7,6 @@ HELP.md
 
 ### Mac ###
 .DS_Store
+
+config/security
+liquibase/config
